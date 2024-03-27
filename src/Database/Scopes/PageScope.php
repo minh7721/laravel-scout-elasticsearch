@@ -38,6 +38,9 @@ class PageScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->forPage($this->page, $this->perPage);
+        $primaryKeyName = $builder->getModel()->getKeyName();
+        $idLatest        = ($this->page - 1) * $this->perPage;
+        $builder->where($primaryKeyName, '>', $idLatest)->limit($this->perPage);
+        //        $builder->forPage($this->page, $this->perPage);
     }
 }
