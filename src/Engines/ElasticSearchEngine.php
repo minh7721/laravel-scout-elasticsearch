@@ -82,7 +82,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function search(BaseBuilder $builder)
     {
-        return $this->performSearch($builder, []);
+        return $this->performSearch($builder, ['size' => $builder->limit]);
     }
 
     /**
@@ -112,7 +112,7 @@ final class ElasticSearchEngine extends Engine
         $hits = app()->makeWith(
             HitsIteratorAggregate::class,
             [
-                'results'  => $results,
+                'results' => $results,
                 'callback' => $builder->queryCallback,
             ]
         );

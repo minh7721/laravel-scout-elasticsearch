@@ -21,12 +21,18 @@ final class SearchFactory
     public static function create(Builder $builder, array $options = []): Search
     {
         $search = new Search();
-        $query = new QueryStringQuery($builder->query);
+        if($builder->query instanceof BuilderInterface){
+            $query = $builder->query;
+        }else{
+            $query = new QueryStringQuery($builder->query);
+        }
         if (static::hasWhereFilters($builder)) {
             $boolQuery = new BoolQuery();
             $boolQuery = static::addWheres($builder, $boolQuery);
             $boolQuery = static::addWhereIns($builder, $boolQuery);
-            $boolQuery->add($query, BoolQuery::MUST);
+            if (! empty($builder->query)) {
+                $boolQuery->add($query, BoolQuery::MUST);
+            }
             $search->addQuery($boolQuery);
         } else {
             $search->addQuery($query);
@@ -36,6 +42,9 @@ final class SearchFactory
         }
         if (array_key_exists('size', $options)) {
             $search->setSize($options['size']);
+        }
+        if (array_key_exists('minScore', $options)) {
+            $search->setMinScore($options['minScore']);
         }
         if (! empty($builder->orders)) {
             foreach ($builder->orders as $order) {
